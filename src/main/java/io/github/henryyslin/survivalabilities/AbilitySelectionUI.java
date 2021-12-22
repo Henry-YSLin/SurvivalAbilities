@@ -99,7 +99,8 @@ public class AbilitySelectionUI implements Listener {
         event.setCancelled(true);
 
         final ItemStack clickedItem = event.getCurrentItem();
-        if (clickedItem == null || clickedItem.getType().isAir()) return;
+        if (clickedItem == null || clickedItem.getType() != Material.ENDER_PEARL) return;
+        if (event.getSlot() < 0 || event.getSlot() >= choices.size()) return;
         if (completed) return;
 
         final Player player = (Player) event.getWhoClicked();
