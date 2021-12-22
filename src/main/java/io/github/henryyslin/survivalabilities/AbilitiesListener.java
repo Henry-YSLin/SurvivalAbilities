@@ -3,6 +3,7 @@ package io.github.henryyslin.survivalabilities;
 import io.github.henry_yslin.enderpearlabilities.EnderPearlAbilities;
 import io.github.henry_yslin.enderpearlabilities.abilities.AbilityInfo;
 import io.github.henry_yslin.enderpearlabilities.abilities.ActivationHand;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -33,13 +34,13 @@ public class AbilitiesListener implements Listener {
 
     private boolean checkStructure(Block hopperBlock) {
         return hopperBlock.getType() == Material.HOPPER
-                && hopperBlock.getRelative(0, 1, 0).getType() == Material.SOUL_SAND
+                && hopperBlock.getRelative(0, 1, 0).getType() == Material.SOUL_SOIL
                 && hopperBlock.getRelative(0, 2, 0).getType() == Material.SOUL_FIRE;
     }
 
     private boolean spendXp(Player player) {
         if (player.getLevel() < 50) {
-            player.sendMessage("You need 50 levels to get a new ability.");
+            player.sendMessage(ChatColor.RED + "You need 50 levels to get a new ability.");
             return false;
         }
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
@@ -75,7 +76,7 @@ public class AbilitiesListener implements Listener {
         return availableChoices.stream().limit(5).toList();
     }
 
-    private void startAbilitySelection(Player player, Block fire) {
+    private void startAbilitySelection(Player player, Block hopper) {
         List<String> choices = config.getAbilityChoices(player.getName());
         if (choices.size() == 0) {
             choices = generateAbilityChoices(player);
@@ -83,6 +84,10 @@ public class AbilitiesListener implements Listener {
         }
 
         new AbilitySelectionUI(plugin, choices, ability -> {
+            if (hopper != null && !checkStructure(hopper)) {
+                player.sendMessage(ChatColor.RED + "The structure has been destroyed.");
+                return;
+            }
             EnderPearlAbilities abilities = EnderPearlAbilities.getInstance();
             Optional<AbilityInfo> info = abilities.getAbilityInfos().stream()
                     .filter(inf -> inf.getCodeName().equals(ability))
@@ -107,9 +112,13 @@ public class AbilitiesListener implements Listener {
             player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getEyeLocation(), 20, 1, 1, 1, 0.1, null, true);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 1, 2);
 
-            if (fire != null)
-                if (fire.getType() == Material.SOUL_FIRE)
-                    fire.setType(Material.AIR);
+            if (hopper != null) {
+                hopper.getWorld().spawnParticle(Particle.SOUL, hopper.getLocation(), 20, 1, 1, 1, 0.01, null, true);
+                if (hopper.getRelative(0, 2, 0).getType() == Material.SOUL_FIRE)
+                    hopper.getRelative(0, 2, 0).setType(Material.AIR);
+                if (hopper.getRelative(0, 1, 0).getType() == Material.SOUL_SOIL)
+                    hopper.getRelative(0, 1, 0).setType(Material.NETHERRACK);
+            }
         }, () -> {
         }).openInventory(player);
     }
@@ -127,7 +136,6 @@ public class AbilitiesListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        player.sendMessage("Use interacted block: " + event.useInteractedBlock());
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getItem() != null && !event.getItem().getType().isAir()) return;
         if (event.getClickedBlock() == null) return;
@@ -138,6 +146,6 @@ public class AbilitiesListener implements Listener {
                 if (!spendXp(player)) return;
             }
         }
-        startAbilitySelection(player, event.getClickedBlock().getRelative(0, 2, 0));
+        startAbilitySelection(player, event.getClickedBlock());
     }
 }

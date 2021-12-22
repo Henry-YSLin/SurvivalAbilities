@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.List;
 import java.util.Optional;
@@ -95,7 +94,6 @@ public class AbilitySelectionUI implements Listener {
 
     @EventHandler
     public void onInventoryClick(final InventoryClickEvent event) {
-        plugin.getLogger().info("Clicked on " + event.getCurrentItem());
         if (!event.getInventory().equals(inventory)) return;
 
         event.setCancelled(true);
