@@ -34,6 +34,7 @@ public class AbilitiesListener implements Listener {
         this.config = config;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean checkStructure(Block hopperBlock) {
         return hopperBlock.getType() == Material.HOPPER
                 && hopperBlock.getRelative(0, 1, 0).getType() == Material.SOUL_SOIL
