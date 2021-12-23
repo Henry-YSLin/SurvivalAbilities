@@ -1,6 +1,7 @@
 package io.github.henryyslin.survivalabilities;
 
 import io.github.henry_yslin.enderpearlabilities.EnderPearlAbilities;
+import io.github.henry_yslin.enderpearlabilities.abilities.Ability;
 import io.github.henry_yslin.enderpearlabilities.abilities.AbilityInfo;
 import io.github.henry_yslin.enderpearlabilities.abilities.ActivationHand;
 import org.bukkit.ChatColor;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AbilitiesListener implements Listener {
 
@@ -50,20 +52,28 @@ public class AbilitiesListener implements Listener {
 
     private List<String> generateAbilityChoices(Player player) {
         EnderPearlAbilities abilities = EnderPearlAbilities.getInstance();
-        List<String> exclusions = abilities.getAbilities().stream()
-                .filter(a -> a.getOwnerName().equals(player.getName()))
+        List<Ability<?>> ownedAbilities = abilities.getAbilities().stream()
+                .filter(ability -> ability.getOwnerName().equals(player.getName()))
+                .collect(Collectors.toList());
+        List<String> exclusions = ownedAbilities.stream()
                 .map(a -> a.getInfo().getCodeName())
                 .distinct()
                 .collect(Collectors.toList());
-        List<ActivationHand> activationHands = abilities.getAbilities().stream()
-                .filter(ability -> ability.getOwnerName().equals(player.getName()))
-                .map(ability -> ability.getInfo().getActivation())
-                .distinct()
-                .toList();
+
+        List<ActivationHand> occupiedHands;
+        if (ownedAbilities.size() == 0) {
+            occupiedHands = List.of(ActivationHand.MainHand);
+        } else {
+            occupiedHands = ownedAbilities.stream()
+                    .map(ability -> ability.getInfo().getActivation())
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
         List<String> availableChoices;
-        if (activationHands.size() == 1) {
+        if (occupiedHands.size() == 1) {
             availableChoices = abilities.getAbilityInfos().stream()
-                    .filter(info -> info.getActivation() != activationHands.get(0))
+                    .filter(info -> info.getActivation() != occupiedHands.get(0))
                     .map(AbilityInfo::getCodeName)
                     .collect(Collectors.toList());
         } else {
@@ -71,6 +81,7 @@ public class AbilitiesListener implements Listener {
                     .map(AbilityInfo::getCodeName)
                     .collect(Collectors.toList());
         }
+
         availableChoices.removeAll(exclusions);
         Collections.shuffle(availableChoices);
         return availableChoices.stream().limit(5).toList();
