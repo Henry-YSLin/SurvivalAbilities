@@ -1,4 +1,4 @@
-package io.github.henryyslin.survivalabilities;
+package io.github.henry_yslin.survivalabilities;
 
 import io.github.henry_yslin.enderpearlabilities.EnderPearlAbilities;
 import io.github.henry_yslin.enderpearlabilities.abilities.Ability;

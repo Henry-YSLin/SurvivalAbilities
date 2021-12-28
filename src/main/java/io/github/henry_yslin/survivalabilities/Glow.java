@@ -1,4 +1,4 @@
-package io.github.henryyslin.survivalabilities;
+package io.github.henry_yslin.survivalabilities;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
