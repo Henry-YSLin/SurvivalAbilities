@@ -24,8 +24,13 @@ public class ConfigManager {
         }
         config.addDefault("player-list", new ArrayList<String>());
         config.addDefault("prompt-on-join", new ArrayList<String>());
+        config.addDefault("xp-cost", 50);
         config.options().copyDefaults(true);
         plugin.saveConfig();
+    }
+
+    public int getXpCost() {
+        return config.getInt("xp-cost");
     }
 
     public boolean isPlayerNew(String player) {

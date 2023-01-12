@@ -41,12 +41,12 @@ public class AbilitiesListener implements Listener {
     }
 
     private boolean spendXp(Player player) {
-        if (player.getLevel() < 50) {
-            player.sendMessage(ChatColor.RED + "You need 50 levels to get a new ability.");
+        if (player.getLevel() < config.getXpCost()) {
+            player.sendMessage(ChatColor.RED + "You need " + config.getXpCost() + " levels to get a new ability.");
             return false;
         }
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-        player.setLevel(player.getLevel() - 50);
+        player.setLevel(player.getLevel() - config.getXpCost());
         return true;
     }
 
