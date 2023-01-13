@@ -1,6 +1,6 @@
 name: SurvivalAbilities
 version: '${project.version}'
 main: io.github.henry_yslin.survivalabilities.SurvivalAbilities
-api-version: 1.18
+api-version: 1.19.2
 depend: [ EnderPearlAbilities ]
 description: A survival-friendly system to obtain abilities.
